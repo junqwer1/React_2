@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./build/",
+    "sourceMap": true,
+    "noImplicitAny": true, // 모든 타이틀, 사용 지양
+    "module": "ESNext",
+    "target": "ES5",
+  },
+  "exclude": ["node_modules"], // 컴파일 배제
+  "include": [ // 컴파일
+    "src/**/*",
+  ]
+}
