@@ -1,7 +1,13 @@
 'use client'
-import { FaRegSquareCheck, FaSquareCheck } from "react-icons/fa6";
+import { FaRegSquareCheck, FaSquareCheck } from 'react-icons/fa6'
 
-const JoinForm = ({ onSubmit, onChange, form, onToggle }): React.ReactNode => {
+const JoinForm = ({
+  onSubmit,
+  onChange,
+  form,
+  onToggle,
+  errors,
+}): React.ReactNode => {
   return (
     <form onSubmit={onSubmit}>
       <dl>
@@ -13,6 +19,7 @@ const JoinForm = ({ onSubmit, onChange, form, onToggle }): React.ReactNode => {
             value={form.email}
             onChange={onChange}
           />
+          {errors?.email && errors.email.map(m => <div key={m}>{m}</div>)}
         </dd>
       </dl>
       <dl>
@@ -24,6 +31,7 @@ const JoinForm = ({ onSubmit, onChange, form, onToggle }): React.ReactNode => {
             value={form.password}
             onChange={onChange}
           />
+          {errors?.password && errors.password.map(m => <div key={m}>{m}</div>)}
         </dd>
       </dl>
       <dl>
@@ -35,6 +43,7 @@ const JoinForm = ({ onSubmit, onChange, form, onToggle }): React.ReactNode => {
             value={form.confirmPassword}
             onChange={onChange}
           />
+          {errors?.confirmPassword && errors.confirmPassword.map(m => <div key={m}>{m}</div>)}
         </dd>
       </dl>
       <dl>
@@ -46,10 +55,12 @@ const JoinForm = ({ onSubmit, onChange, form, onToggle }): React.ReactNode => {
             value={form.name}
             onChange={onChange}
           />
+          {errors?.name && errors.name.map(m => <div key={m}>{m}</div>)}
         </dd>
       </dl>
       <div onClick={onToggle}>
-        {form.agree ? <FaSquareCheck /> : <FaRegSquareCheck />} 회원가입 약관에 동의합니다.
+        {form.agree ? <FaSquareCheck /> : <FaRegSquareCheck />} 회원가입 약관에
+        동의합니다.
       </div>
       <button type="submit">가입하기</button>
     </form>
