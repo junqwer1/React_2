@@ -12,9 +12,25 @@ type FormType = {
 }
 
 const JoinContainer = () => {
-  const { form, setForm } = useState<FormType>({})
+  const [form, setForm] = useState<FormType>({})
   const actionState = useActionState(processJoin, {})
-  return <JoinForm actionState={actionState} />
+
+  const handleChange = (e) => {
+    setForm((form) => ({ ...form, [e.target.name]: e.target.value }))
+  }
+
+  const handleToggle = () => {
+    setForm((form) => ({ ...form, agree: !Boolean(form.agree) }))
+  }
+
+  return (
+    <JoinForm
+      actionState={actionState}
+      onChange={handleChange}
+      onToggle={handleToggle}
+      form={form}
+    />
+  )
 }
 
 export default JoinContainer
