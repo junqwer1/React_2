@@ -1,5 +1,6 @@
 'use server'
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 
 export const processJoin = async (formState, formData: FormData) => {
   /**
@@ -8,9 +9,8 @@ export const processJoin = async (formState, formData: FormData) => {
    * 3) 서버쪽에 처리 요청
    * 4) 후속 처리 -> 로그인 페이지 이동
    */
-
   let errors = {}
-  let hasErrors
+  let hasErrors = false
 
   // 1) 필수 항목 검증 S
   const requiredFields = {
@@ -24,6 +24,7 @@ export const processJoin = async (formState, formData: FormData) => {
     if (!value || !value?.trim()) {
       errors[field] = errors[field] ?? []
       errors[field].push(msg)
+      hasErrors = true
     }
   }
   // 1) 필수 항목 검증 E
@@ -33,17 +34,18 @@ export const processJoin = async (formState, formData: FormData) => {
   const confirmPassword = formData.get('confirmPassword')
   if (
     password &&
-    password.trim() &&
+    password?.trim() &&
     confirmPassword &&
     confirmPassword?.trim() &&
     password !== confirmPassword
   ) {
     errors.confirmPassword = errors.confirmPassword ?? []
     errors.confirmPassword.push('비밀번호가 일치하지 않습니다.')
+    hasErrors = true
   }
 
   // 3) 서버쪽에 처리 요청
-  const form = { ...formData.entries() }
+  const form = {}
   for (const [key, value] of formData.entries()) {
     if (['email', 'password', 'confirmPassword', 'name'].includes(key)) {
       form[key] = value
@@ -53,7 +55,6 @@ export const processJoin = async (formState, formData: FormData) => {
   form.requiredTerms1 = true
   form.requiredTerms2 = true
   form.requiredTerms3 = true
-
   try {
     const res = await fetch('https://member-service.koreait.xyz/join', {
       method: 'POST',
@@ -69,14 +70,16 @@ export const processJoin = async (formState, formData: FormData) => {
         errors = result.message
         hasErrors = true
       }
-    } else {
-      // 회원가입 성공시에는 로그인 페이지로 이동
-      redirect('/member/login')
     }
   } catch (err) {
-    console.log(err)
+    console.error(err)
   }
-  return errors
+  if (hasErrors) {
+    return errors
+  }
+
+  //  회원가입 성공시에는 로그인 페이지로 이동
+  redirect('/member/login')
 }
 
 /**
@@ -95,9 +98,10 @@ export const processLogin = async (form, formData: FormData) => {
 
   const errors = {}
   let hasErrors = false
-  // 1) 필수 항목 검증 S
+  // 1) 필수 항목 검증 - S
   const email = formData.get('email')
   const password = formData.get('password')
+
   if (!email || !email.trim()) {
     errors.email = errors?.email ?? []
     errors.email.push('이메일을 입력하세요.')
@@ -112,21 +116,64 @@ export const processLogin = async (form, formData: FormData) => {
   if (hasErrors) {
     return errors
   }
-
-  // 1) 필수 항목 검증 E
+  // 1) 필수 항목 검증 - E
 
   // 2) 서버 요청 - S
-  const apiUrl = process.env.API_URL + '/member/login'
+  const apiUrl = process.env.API_URL + '/member-service/login'
   try {
     const res = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({email, password})
+      body: JSON.stringify({ email, password }),
     })
+    const result = await res.json()
+    if (result.success) {
+      // 성공시
+      const cookie = await cookies()
+      cookie.set('token', result.data, {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+        path: '/',
+      })
+    } else {
+      // 실패시
+      return result.message
+    }
   } catch (err) {
-    console.log(err)
+    console.error(err)
   }
   // 2) 서버 요청 - E
+
+  redirect('/')
+}
+
+/**
+ * 로그인한 사용자 정보 조회
+ *  - token 쿠키를 가지고 서버에 요청
+ */
+export const getUserInfo = async () => {
+  const cookie = await cookies()
+  const token = cookie.get('token')
+
+  if (!token || !token.value) return
+
+  try {
+    const apiUrl = process.env.API_URL + '/member-service'
+    const res = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    })
+    if (res.status === 200) {
+      const result = await res.json()
+
+      return result.data
+    }
+  } catch (err) {
+    console.error(err)
+  }
 }
