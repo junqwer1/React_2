@@ -1,5 +1,5 @@
 'use server'
-import { redirect } from "next/navigation"
+import { redirect } from 'next/navigation'
 
 export const processJoin = async (formState, formData: FormData) => {
   /**
@@ -50,9 +50,9 @@ export const processJoin = async (formState, formData: FormData) => {
     }
   }
 
-  form.requiredTerms1 = true;
-  form.requiredTerms2 = true;
-  form.requiredTerms3 = true;
+  form.requiredTerms1 = true
+  form.requiredTerms2 = true
+  form.requiredTerms3 = true
 
   try {
     const res = await fetch('https://member-service.koreait.xyz/join', {
@@ -62,9 +62,9 @@ export const processJoin = async (formState, formData: FormData) => {
       },
       body: JSON.stringify(form),
     })
-    if (res.status !== 201) { 
+    if (res.status !== 201) {
       // 처리 실패 -> 에러 출력
-      const result = await res.json();
+      const result = await res.json()
       if (!result.success) {
         errors = result.message
         hasErrors = true
@@ -79,6 +79,54 @@ export const processJoin = async (formState, formData: FormData) => {
   return errors
 }
 
+/**
+ * 로그인 처리
+ *
+ * @param form
+ * @param formData
+ */
 export const processLogin = async (form, formData: FormData) => {
+  /**
+   * 1) 필수 항목 검증
+   * 2) 서버 요청
+   * 3) 실패시 에러 메세지 출력
+   * 4) 성공시 지정된 주소 또는 메인으로 이동
+   */
 
+  const errors = {}
+  let hasErrors = false
+  // 1) 필수 항목 검증 S
+  const email = formData.get('email')
+  const password = formData.get('password')
+  if (!email || !email.trim()) {
+    errors.email = errors?.email ?? []
+    errors.email.push('이메일을 입력하세요.')
+    hasErrors = true
+  }
+
+  if (!password || !password.trim()) {
+    errors.password = errors?.password ?? []
+    errors.password.push('비밀번호를 입력하세요.')
+    hasErrors = true
+  }
+  if (hasErrors) {
+    return errors
+  }
+
+  // 1) 필수 항목 검증 E
+
+  // 2) 서버 요청 - S
+  const apiUrl = process.env.API_URL + '/member/login'
+  try {
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({email, password})
+    })
+  } catch (err) {
+    console.log(err)
+  }
+  // 2) 서버 요청 - E
 }
