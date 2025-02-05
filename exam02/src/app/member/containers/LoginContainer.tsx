@@ -1,7 +1,12 @@
 'use client'
 import LoginForm from "../components/LoginForm";
+import styled from "styled-components";
 import React, { useActionState, useState } from "react";
 import { processLogin } from "../service/actions";
+
+const StyledLoginForm = styled(LoginForm)`
+  border: 10px solid orange;
+`
 
 const LoginContainer = () => {
   const [ form, setForm ] = useState<{email?: string; password?: string}>({})
@@ -11,7 +16,7 @@ const LoginContainer = () => {
     setForm((form) => ({...form, [e.target.name]: e.target.value}))
   }
   
-  return <LoginForm actionState={actionState} form={form} onChange={handleChange} />
+  return <StyledLoginForm actionState={actionState} form={form} onChange={handleChange} />
 }
 
 export default React.memo(LoginContainer);
