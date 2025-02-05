@@ -1,6 +1,6 @@
 'use client'
 import LoginForm from "../components/LoginForm";
-import { useActionState, useState } from "react";
+import React, { useActionState, useState } from "react";
 import { processLogin } from "../service/actions";
 
 const LoginContainer = () => {
@@ -14,4 +14,4 @@ const LoginContainer = () => {
   return <LoginForm actionState={actionState} form={form} onChange={handleChange} />
 }
 
-export default LoginContainer;
+export default React.memo(LoginContainer);

@@ -1,5 +1,6 @@
 'use client'
-import { useRef, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react'
+import styles from "./member.module.scss"
 
 const LoginForm = ({ form, onChange, actionState }) => {
   const [errors, formAction, isPending] = actionState
@@ -15,8 +16,8 @@ const LoginForm = ({ form, onChange, actionState }) => {
   return (
     <>
       <form action={formAction}>
-        <dl>
-          <dt>이메일</dt>
+        <dl className={styles.row}>
+          <dt className={styles.title}>이메일</dt>
           <dd>
             <input
               ref={emailEl}
@@ -50,4 +51,4 @@ const LoginForm = ({ form, onChange, actionState }) => {
   )
 }
 
-export default LoginForm
+export default React.memo(LoginForm)

@@ -1,0 +1,23 @@
+@import './utils.scss';
+
+.box-group{
+  .box {
+    background: $red;
+    @include sqaure(1);
+
+    &.blue {
+      background: $blue;
+      @include sqaure(2);
+    }
+
+    &.orange {
+      background: $orange;
+      @include sqaure(3);
+    }
+
+    &.gray {
+      background: $gray;
+      @include sqaure(4);
+    }
+  }
+}
